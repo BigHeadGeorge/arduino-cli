@@ -19,6 +19,7 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"os"
+	"os/user"
 	"strings"
 
 	"github.com/arduino/go-paths-helper"
@@ -34,7 +35,10 @@ func GenBuildPath(sketchPath *paths.Path) *paths.Path {
 	}
 	md5SumBytes := md5.Sum([]byte(path))
 	md5Sum := strings.ToUpper(hex.EncodeToString(md5SumBytes[:]))
-	return paths.TempDir().Join("arduino-sketch-" + md5Sum)
+	user, _ := user.Current()
+	userSumBytes := md5.Sum([]byte(user.Uid))
+	userSum := strings.ToUpper(hex.EncodeToString(userSumBytes[:]))
+	return paths.TempDir().Join("arduino-sketch-" + md5Sum + "-" + userSum)
 }
 
 // EnsureBuildPathExists creates the build path if doesn't already exists.
